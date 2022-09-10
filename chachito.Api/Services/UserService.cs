@@ -1,12 +1,13 @@
 using chachito.Api.Data;
 using chachito.Api.Dto;
+using helperLibrary;
 using Microsoft.EntityFrameworkCore;
 
 namespace chachito.Api.Services
 {
     public interface IUserService
     {
-        Task<ICollection<UserDto>> GetAllAsync();
+        Task<ICollection<UserAllDto>> GetAllAsync();
         Task<UserDto> GetAsync(int id);
         Task AddAsync(UserDto request);
         Task UpdateAsync(int id, UserDto request);
@@ -20,21 +21,33 @@ namespace chachito.Api.Services
             _db = db;
         }
 
-        public Task AddAsync(UserDto request)
+        public async Task AddAsync(UserDto request)
         {
-            throw new NotImplementedException();
+            var entity = new User
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Phone = request.Phone,
+                Address = request.Address
+            };
+            _db.Users.Add(entity);
+            await _db.SaveChangesAsync();
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var entityDelete = await _db.Users.Where(x => x.Deleted == false &&
+                                              x.Id == id).FirstOrDefaultAsync();
+            entityDelete.Deleted = true;
+            await _db.SaveChangesAsync();
         }
 
-        public async Task<ICollection<UserDto>> GetAllAsync()
+        public async Task<ICollection<UserAllDto>> GetAllAsync()
         {
             var baseQuery = await _db.Users.Where(x => x.Deleted == false).ToListAsync();
             
-            var item = baseQuery.Select(x => new UserDto{
+            var item = baseQuery.Select(x => new UserAllDto{
+                Id = x.Id,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 Address = x.Address,
@@ -58,9 +71,16 @@ namespace chachito.Api.Services
             return item;
         }
 
-        public Task UpdateAsync(int id, UserDto request)
+        public async Task UpdateAsync(int id, UserDto request)
         {
-            throw new NotImplementedException();
+            var entityToUpdate = await _db.Users.Where(x => x.Deleted == false &&
+                                                        x.Id == id).FirstOrDefaultAsync();
+            entityToUpdate.FirstName = request.FirstName;
+            entityToUpdate.LastName = request.LastName;
+            entityToUpdate.Address = request.Address;
+            entityToUpdate.Phone = request.Phone;
+
+            await _db.SaveChangesAsync();
         }
     }
 }
