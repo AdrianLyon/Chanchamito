@@ -6,4 +6,5 @@ public class User
     public string? LastName {get; set; }
     public string? Address {get; set; }
     public string? Phone {get; set;}
+    public bool Deleted { get; set; }
 }
