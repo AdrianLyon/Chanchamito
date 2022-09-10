@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using chachito.Api.Data;
 
@@ -11,9 +12,10 @@ using chachito.Api.Data;
 namespace chachito.Api.Migrations
 {
     [DbContext(typeof(ChanchitoDbContext))]
-    partial class ChanchitoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220910111840_FixedProduct")]
+    partial class FixedProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,8 +90,6 @@ namespace chachito.Api.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("OrderDetail", (string)null);
                 });
 
@@ -104,6 +104,9 @@ namespace chachito.Api.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("OrderDetailId")
+                        .HasColumnType("int");
+
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
@@ -117,6 +120,8 @@ namespace chachito.Api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderDetailId");
 
                     b.HasIndex("ProductCategoryId");
 
@@ -189,19 +194,15 @@ namespace chachito.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("helperLibrary.Product", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Order");
-
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("helperLibrary.Product", b =>
                 {
+                    b.HasOne("helperLibrary.OrderDetail", null)
+                        .WithMany("Products")
+                        .HasForeignKey("OrderDetailId");
+
                     b.HasOne("helperLibrary.ProductCategory", "ProductCategory")
                         .WithMany()
                         .HasForeignKey("ProductCategoryId")
@@ -209,6 +210,11 @@ namespace chachito.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("ProductCategory");
+                });
+
+            modelBuilder.Entity("helperLibrary.OrderDetail", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

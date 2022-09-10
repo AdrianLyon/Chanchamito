@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using chachito.Api.Data;
 
@@ -11,9 +12,10 @@ using chachito.Api.Data;
 namespace chachito.Api.Migrations
 {
     [DbContext(typeof(ChanchitoDbContext))]
-    partial class ChanchitoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220910111318_FixedModels")]
+    partial class FixedModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,8 +90,6 @@ namespace chachito.Api.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("OrderDetail", (string)null);
                 });
 
@@ -103,6 +103,9 @@ namespace chachito.Api.Migrations
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("OrderDetailId")
+                        .HasColumnType("int");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
@@ -118,7 +121,7 @@ namespace chachito.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductCategoryId");
+                    b.HasIndex("OrderDetailId");
 
                     b.ToTable("Product", (string)null);
                 });
@@ -137,7 +140,12 @@ namespace chachito.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductCategory", (string)null);
                 });
@@ -189,26 +197,31 @@ namespace chachito.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("helperLibrary.Product", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Order");
+                });
 
+            modelBuilder.Entity("helperLibrary.Product", b =>
+                {
+                    b.HasOne("helperLibrary.OrderDetail", null)
+                        .WithMany("Products")
+                        .HasForeignKey("OrderDetailId");
+                });
+
+            modelBuilder.Entity("helperLibrary.ProductCategory", b =>
+                {
+                    b.HasOne("helperLibrary.Product", null)
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId");
+                });
+
+            modelBuilder.Entity("helperLibrary.OrderDetail", b =>
+                {
                     b.Navigation("Products");
                 });
 
             modelBuilder.Entity("helperLibrary.Product", b =>
                 {
-                    b.HasOne("helperLibrary.ProductCategory", "ProductCategory")
-                        .WithMany()
-                        .HasForeignKey("ProductCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProductCategory");
+                    b.Navigation("ProductCategories");
                 });
 #pragma warning restore 612, 618
         }
