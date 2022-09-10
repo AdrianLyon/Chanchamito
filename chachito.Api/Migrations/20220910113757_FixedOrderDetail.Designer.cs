@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using chachito.Api.Data;
 
@@ -11,9 +12,10 @@ using chachito.Api.Data;
 namespace chachito.Api.Migrations
 {
     [DbContext(typeof(ChanchitoDbContext))]
-    partial class ChanchitoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220910113757_FixedOrderDetail")]
+    partial class FixedOrderDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
