@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace chachito.Api.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -14,12 +13,19 @@ namespace chachito.Api.Controllers
         {
             _userService = userService;
         }
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             var model = await _userService.GetAllAsync();
             if (model == null)NotFound();
+            return Ok(model);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var model = await _userService.GetAsync(id);
+            if (model == null) NotFound();
             return Ok(model);
         }
     }
