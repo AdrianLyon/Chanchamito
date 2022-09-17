@@ -1,7 +1,7 @@
-using helperLibrary;
+using chachito.Api.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace chachito.Api.Data
+namespace chachito.Api.Infrastructure.Persistence
 {
     public class ChanchitoDbContext : DbContext
     {
@@ -9,7 +9,6 @@ namespace chachito.Api.Data
         {
             
         }
-
         public DbSet<User> Users{get; set;}
         public DbSet<Order> Orders{get; set;}
         public DbSet<OrderDetail> OrderDetails{get; set;}

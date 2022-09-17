@@ -1,6 +1,6 @@
-using chachito.Api.Dto;
-using chachito.Api.Services;
-using Microsoft.AspNetCore.Authorization;
+using chachito.Api.Features.User.Commands;
+using chachito.Api.Features.User.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace chachito.Api.Controllers
@@ -9,45 +9,50 @@ namespace chachito.Api.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IMediator _mediator;
+        public UserController(IMediator mediator)
         {
-            _userService = userService;
+            _mediator = mediator;
         }
+
+        /// <summary>
+        /// Get all users
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            var model = await _userService.GetAllAsync();
-            if (model == null)NotFound();
-            return Ok(model);
-        }
+        public async Task<List<GetUsersQueryResponse>> Get() => await _mediator.Send(new GetUsersQuery());
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
-        {
-            var model = await _userService.GetAsync(id);
-            if (model == null) NotFound();
-            return Ok(model);
-        }
+        /// <summary>
+        /// Get a user by ID
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("{UserId}")]
+        public async Task<GetUserQueryResponse> Get([FromRoute] GetUserQuery query) => await _mediator.Send(query);
 
+        /// <summary>
+        /// Crea un producto nuevo
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Post(UserDto response)
+        public async Task<IActionResult> Post([FromBody] CreateUserCommand command)
         {
-            await _userService.AddAsync(response);
+            await _mediator.Send(command);
             return StatusCode(201);
         }
-        [HttpPut]
-        public async Task<IActionResult> Put(int id, UserDto response)
-        {
-            await _userService.UpdateAsync(id,response);
-            return StatusCode(201);
-        }
+        // [HttpPut]
+        // public async Task<IActionResult> Put(int id, UserDto response)
+        // {
+        //     await _userService.UpdateAsync(id,response);
+        //     return StatusCode(201);
+        // }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _userService.DeleteAsync(id);
-            return StatusCode(201);
-        }
+        // [HttpDelete]
+        // public async Task<IActionResult> Delete(int id)
+        // {
+        //     await _userService.DeleteAsync(id);
+        //     return StatusCode(201);
+        // }
     }
 }

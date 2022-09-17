@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using chachito.Api.Data;
+using chachito.Api.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace chachito.Api.Migrations
+namespace chachito.Api.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ChanchitoDbContext))]
-    [Migration("20220910071318_AddDeletedUser")]
-    partial class AddDeletedUser
+    partial class ChanchitoDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +22,7 @@ namespace chachito.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("helperLibrary.Order", b =>
+            modelBuilder.Entity("chachito.Api.Domain.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +58,7 @@ namespace chachito.Api.Migrations
                     b.ToTable("Order", (string)null);
                 });
 
-            modelBuilder.Entity("helperLibrary.OrderDetail", b =>
+            modelBuilder.Entity("chachito.Api.Domain.OrderDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,23 +75,25 @@ namespace chachito.Api.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("QuantityOrder")
                         .HasColumnType("int");
+
+                    b.Property<double>("Total")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("OrderDetail", (string)null);
                 });
 
-            modelBuilder.Entity("helperLibrary.Product", b =>
+            modelBuilder.Entity("chachito.Api.Domain.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,23 +104,26 @@ namespace chachito.Api.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("OrderDetailId")
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductTypeId")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderDetailId");
+                    b.HasIndex("ProductCategoryId");
 
                     b.ToTable("Product", (string)null);
                 });
 
-            modelBuilder.Entity("helperLibrary.ProductCategory", b =>
+            modelBuilder.Entity("chachito.Api.Domain.ProductCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,17 +137,12 @@ namespace chachito.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductCategory", (string)null);
                 });
 
-            modelBuilder.Entity("helperLibrary.User", b =>
+            modelBuilder.Entity("chachito.Api.Domain.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -153,6 +151,7 @@ namespace chachito.Api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Deleted")
@@ -165,6 +164,7 @@ namespace chachito.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -172,9 +172,9 @@ namespace chachito.Api.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("helperLibrary.Order", b =>
+            modelBuilder.Entity("chachito.Api.Domain.Order", b =>
                 {
-                    b.HasOne("helperLibrary.User", "User")
+                    b.HasOne("chachito.Api.Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -183,39 +183,34 @@ namespace chachito.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("helperLibrary.OrderDetail", b =>
+            modelBuilder.Entity("chachito.Api.Domain.OrderDetail", b =>
                 {
-                    b.HasOne("helperLibrary.Order", "Order")
+                    b.HasOne("chachito.Api.Domain.Order", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("chachito.Api.Domain.Product", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
-                });
 
-            modelBuilder.Entity("helperLibrary.Product", b =>
-                {
-                    b.HasOne("helperLibrary.OrderDetail", null)
-                        .WithMany("Products")
-                        .HasForeignKey("OrderDetailId");
-                });
-
-            modelBuilder.Entity("helperLibrary.ProductCategory", b =>
-                {
-                    b.HasOne("helperLibrary.Product", null)
-                        .WithMany("ProductTypes")
-                        .HasForeignKey("ProductId");
-                });
-
-            modelBuilder.Entity("helperLibrary.OrderDetail", b =>
-                {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("helperLibrary.Product", b =>
+            modelBuilder.Entity("chachito.Api.Domain.Product", b =>
                 {
-                    b.Navigation("ProductTypes");
+                    b.HasOne("chachito.Api.Domain.ProductCategory", "ProductCategory")
+                        .WithMany()
+                        .HasForeignKey("ProductCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductCategory");
                 });
 #pragma warning restore 612, 618
         }

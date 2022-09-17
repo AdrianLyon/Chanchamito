@@ -1,4 +1,4 @@
-﻿namespace helperLibrary;
+﻿namespace chachito.Api.Domain{
 public class Order
     {
         public int Id { get; set; }
@@ -11,3 +11,4 @@ public class Order
         public int UserId { get; set; }
         public virtual User? User { get; set;}
     }
+}
