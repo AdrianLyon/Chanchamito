@@ -31,7 +31,7 @@ namespace chachito.Api.Controllers
         public async Task<GetUserQueryResponse> Get([FromRoute] GetUserQuery query) => await _mediator.Send(query);
 
         /// <summary>
-        /// Crea un producto nuevo
+        /// Create a new user
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
